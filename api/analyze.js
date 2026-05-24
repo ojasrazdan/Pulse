@@ -2,23 +2,23 @@ import dotenv from "dotenv";
 import Groq from "groq-sdk";
 import formidable from "formidable";
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 dotenv.config();
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const parseForm = (req) =>
-  new Promise((resolve, reject) => {
-    const form = new formidable.IncomingForm({ multiples: false });
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ fields, files });
-      }
-    });
-  });
+const parseForm = async (req) => {
+  const form = formidable({ multiples: false });
+  const [fields, files] = await form.parse(req);
+  return { fields, files };
+};
 
 const createFallbackAnalysis = (transcript) => ({
   sentiment: "Neutral",
