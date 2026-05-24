@@ -14,11 +14,16 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const parseForm = async (req) => {
-  const form = formidable({ multiples: false });
-  const [fields, files] = await form.parse(req);
-  return { fields, files };
-};
+const parseForm = (req) =>
+  new Promise((resolve, reject) => {
+    const form = formidable({ multiples: false });
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve({ fields, files });
+    });
+  });
 
 const createFallbackAnalysis = (transcript) => ({
   sentiment: "Neutral",
