@@ -16,6 +16,10 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+if (!process.env.GROQ_API_KEY) {
+  console.error("ERROR: GROQ_API_KEY is not set. Add it to .env or the environment before running the backend.");
+}
+
 app.post("/api/analyze", upload.single("audio"), async (req, res) => {
   try {
     let transcript = "";
@@ -37,7 +41,7 @@ app.post("/api/analyze", upload.single("audio"), async (req, res) => {
     }
 
     const completion = await groq.chat.completions.create({
-      model: "llama3-70b-8192",
+      model: "llama-3.3-70b-versatile",
       temperature: 0.3,
       messages: [
         {
@@ -67,13 +71,18 @@ Positive, Neutral, or Negative.
       ],
     });
 
-    const raw = completion.choices[0].message.content;
+    const raw = completion?.choices?.[0]?.message?.content;
+
+    if (!raw) {
+      throw new Error("Groq returned no text content.");
+    }
 
     let analysis;
 
     try {
       analysis = JSON.parse(raw);
     } catch (err) {
+      console.warn("Groq returned non-JSON content, falling back to summary.", raw);
       analysis = {
         sentiment: "Neutral",
         summary: transcript,
@@ -88,15 +97,15 @@ Positive, Neutral, or Negative.
       analysis,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Groq analysis error:", error);
 
     res.status(500).json({
-      error: "Analysis failed",
+      error: error?.message || "Analysis failed",
     });
   }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5178;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

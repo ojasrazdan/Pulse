@@ -5,6 +5,11 @@ import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   const [view, setView] = useState("dashboard");
+  const [responses, setResponses] = useState([]);
+
+  const addResponse = (response) => {
+    setResponses((prev) => [response, ...prev]);
+  };
 
   return (
     <div className="app-shell">
@@ -23,7 +28,11 @@ function App() {
         </button>
       </div>
 
-      {view === "dashboard" ? <AdminDashboard /> : <PulseCapture />}
+      {view === "dashboard" ? (
+        <AdminDashboard responses={responses} />
+      ) : (
+        <PulseCapture onResponseSaved={addResponse} />
+      )}
     </div>
   );
 }

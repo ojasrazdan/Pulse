@@ -385,7 +385,7 @@
 
 .admin-vi {
   border-bottom: 1px solid var(--bd);
-  padding: 10px 0;
+  padding: 12px 0;
 }
 
 .admin-vi:last-child { border: none; padding-bottom: 0; }
@@ -395,12 +395,22 @@
   color: var(--ink);
   line-height: 1.6;
   font-style: italic;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .admin-vm {
   font-size: 11px;
   color: var(--ink3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.admin-empty {
+  color: var(--ink3);
+  padding: 16px 0;
+  font-size: 13px;
 }
 
 .admin-sy-l {

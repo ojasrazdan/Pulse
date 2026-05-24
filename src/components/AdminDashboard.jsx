@@ -225,22 +225,36 @@ function AdminDashboard({ responses = [] }) {
 
         <section className="admin-vcard">
           <div className="admin-pt">Representative verbatims</div>
-          <div className="admin-vi">
-            <div className="admin-vq">
-              "I can log in fine but every time I save an amendment I'm not sure if it actually worked — I click save twice just in case."
+          {responses.length === 0 ? (
+            <div className="admin-vq admin-empty">
+              No recent responses yet. Submit a pulse to populate this section.
             </div>
-            <div className="admin-vm">
-              Scheduler · APAC · Amend flow <span className="admin-tag admin-tb">Negative</span>
-            </div>
-          </div>
-          <div className="admin-vi">
-            <div className="admin-vq">
-              "The dashboard shows zero audits and I don't know if that's correct or if something's wrong with my access."
-            </div>
-            <div className="admin-vm">
-              Auditor · APAC · Dashboard clarity <span className="admin-tag admin-tb">Negative</span>
-            </div>
-          </div>
+          ) : (
+            responses.map((response, index) => {
+              const sentiment = response.analysis?.sentiment || "Neutral";
+              const themeText = Array.isArray(response.analysis?.themes)
+                ? response.analysis.themes.join(", ")
+                : response.analysis?.themes || "General Feedback";
+              const actionText = response.analysis?.recommendedAction || "No action available.";
+              const tagClass = sentiment.toLowerCase() === "positive"
+                ? "admin-tg"
+                : sentiment.toLowerCase() === "negative"
+                ? "admin-tb"
+                : "admin-tn2";
+
+              return (
+                <div className="admin-vi" key={`${response.submittedAt}-${index}`}>
+                  <div className="admin-vq">"{response.transcript}"</div>
+                  <div className="admin-vm">
+                    {sentiment} · {themeText} · {actionText}
+                    <span className={`admin-tag ${tagClass}`}>
+                      {sentiment}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </section>
 
         <section className="admin-summary">
