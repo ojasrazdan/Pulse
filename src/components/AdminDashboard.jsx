@@ -1,6 +1,11 @@
 import "./AdminDashboard.css";
 
-function AdminDashboard() {
+function AdminDashboard({ responses = [] }) {
+  const truncate = (value, maxLength = 80) => {
+    if (!value) return "—";
+    return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-wrap">
@@ -25,6 +30,43 @@ function AdminDashboard() {
             <div className="admin-ad" />APAC Auditors — escalate
           </div>
         </div>
+
+        {responses.length > 0 && (
+          <section className="admin-panel admin-response-panel">
+            <div className="admin-pt">Recent responses</div>
+            <div className="admin-response-table-wrap">
+              <table className="admin-response-table">
+                <thead>
+                  <tr>
+                    <th>Transcript</th>
+                    <th>Sentiment</th>
+                    <th>Summary</th>
+                    <th>Action</th>
+                    <th>Themes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {responses.map((response, index) => {
+                    const analysis = response.analysis || {};
+                    const themes = Array.isArray(analysis.themes)
+                      ? analysis.themes.join(", ")
+                      : analysis.themes || "None";
+
+                    return (
+                      <tr key={`${response.submittedAt}-${index}`}>
+                        <td>{truncate(response.transcript, 40)}</td>
+                        <td>{analysis.sentiment || "Unknown"}</td>
+                        <td>{truncate(analysis.summary || "No summary available.", 70)}</td>
+                        <td>{truncate(analysis.recommendedAction || "No action available.", 50)}</td>
+                        <td>{truncate(themes, 40)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
         <div className="admin-mets">
           <section className="admin-mc">

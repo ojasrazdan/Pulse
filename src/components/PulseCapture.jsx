@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./PulseCapture.css";
 import { QUESTIONS } from "../data/questions";
 
-function PulseCapture() {
+function PulseCapture({ onResponseSaved }) {
   const [qIdx, setQIdx] = useState(0);
   const [recording, setRecording] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(10);
@@ -12,7 +12,6 @@ function PulseCapture() {
   const [hasAudio, setHasAudio] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
   const [waveHeights, setWaveHeights] = useState(Array(24).fill(5));
-  const [analysis, setAnalysis] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
 
@@ -115,7 +114,6 @@ function PulseCapture() {
   };
 
   const analyzeResponse = async ({ audioBlob, textResponse }) => {
-    setAnalysis(null);
     setAnalysisError("");
     setAnalysisLoading(true);
 
@@ -156,11 +154,10 @@ function PulseCapture() {
         throw new Error(`Empty response from analysis service (status ${res.status})`);
       }
 
-      setAnalysis(payload);
-      return true;
+      return payload;
     } catch (error) {
       setAnalysisError(error.message || "Unable to analyze response.");
-      return false;
+      return null;
     } finally {
       setAnalysisLoading(false);
     }
@@ -171,11 +168,17 @@ function PulseCapture() {
       return;
     }
 
-    const success = await analyzeResponse({ audioBlob: audioBlob ?? null, textResponse: text.trim() });
+    const payload = await analyzeResponse({ audioBlob: audioBlob ?? null, textResponse: text.trim() });
 
-    if (!success) {
+    if (!payload) {
       return;
     }
+
+    onResponseSaved?.({
+      transcript: payload.transcript,
+      analysis: payload.analysis,
+      submittedAt: new Date().toISOString(),
+    });
 
     setShowThanks(true);
     setText("");
@@ -256,29 +259,6 @@ function PulseCapture() {
               <p className="analysis-loading">Analyzing voice response with AI...</p>
             ) : analysisError ? (
               <p className="analysis-error">{analysisError}</p>
-            ) : analysis ? (
-              <div className="analysis-card">
-                <div className="analysis-row">
-                  <span className="analysis-label">Transcript</span>
-                  <span>{analysis.transcript}</span>
-                </div>
-                <div className="analysis-row">
-                  <span className="analysis-label">Sentiment</span>
-                  <span>{analysis.analysis?.sentiment || "Unknown"}</span>
-                </div>
-                <div className="analysis-row">
-                  <span className="analysis-label">Summary</span>
-                  <span>{analysis.analysis?.summary || "No summary available."}</span>
-                </div>
-                <div className="analysis-row">
-                  <span className="analysis-label">Action</span>
-                  <span>{analysis.analysis?.recommendedAction || "No recommendation available."}</span>
-                </div>
-                <div className="analysis-row">
-                  <span className="analysis-label">Themes</span>
-                  <span>{Array.isArray(analysis.analysis?.themes) ? analysis.analysis.themes.join(", ") : analysis.analysis?.themes || "None"}</span>
-                </div>
-              </div>
             ) : null}
 
             <button className="again" onClick={nextQuestion}>
