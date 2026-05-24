@@ -162,7 +162,7 @@ function PulseCapture({ onResponseSaved }) {
       const message =
         error?.message?.includes("Failed to fetch") ||
         error?.message?.includes("NetworkError")
-          ? "Could not reach the analysis service. Make sure the backend is running on port 5178 and that the frontend is being served through Vite."
+          ? "Could not reach the analysis service. Confirm the Vercel deployment is using the correct project root and that /api/analyze is available."
           : error.message || "Unable to analyze response.";
 
       setAnalysisError(message);
