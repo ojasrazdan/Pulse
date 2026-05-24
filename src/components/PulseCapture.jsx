@@ -269,6 +269,7 @@ function PulseCapture({ onResponseSaved }) {
               Answer another question
             </button>
           </div>
+        </>
       )}
     </div>
   );
