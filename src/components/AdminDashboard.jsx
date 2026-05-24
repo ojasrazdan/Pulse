@@ -6,13 +6,26 @@ function AdminDashboard({ responses = [] }) {
     return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
   };
 
+  const responseCount = responses.length;
+  const updatedAt = responseCount
+    ? new Date(responses[0].submittedAt).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "09:41";
+  const reportDate = new Date().toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div className="admin-page">
       <div className="admin-wrap">
         <header className="admin-hd">
           <div>
             <h1 className="admin-title">Pulse</h1>
-            <p className="admin-sub">Leadership view · 7 May 2026 · 47 responses · Updated 09:41</p>
+            <p className="admin-sub">Leadership view · {reportDate} · {responseCount} response{responseCount === 1 ? "" : "s"} · Updated {updatedAt}</p>
           </div>
           <div className="admin-live">
             <span className="admin-ld" />Live

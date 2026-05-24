@@ -127,7 +127,10 @@ function PulseCapture({ onResponseSaved }) {
         formData.append("text", textResponse);
       }
 
-      const res = await fetch("/api/analyze", {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "";
+      const endpoint = apiBase ? `${apiBase.replace(/\/+$|$/, "")}/api/analyze` : "/api/analyze";
+
+      const res = await fetch(endpoint, {
         method: "POST",
         body: formData,
       });
@@ -156,7 +159,13 @@ function PulseCapture({ onResponseSaved }) {
 
       return payload;
     } catch (error) {
-      setAnalysisError(error.message || "Unable to analyze response.");
+      const message =
+        error?.message?.includes("Failed to fetch") ||
+        error?.message?.includes("NetworkError")
+          ? "Could not reach the analysis service. Make sure the backend is running on port 5178 and that the frontend is being served through Vite."
+          : error.message || "Unable to analyze response.";
+
+      setAnalysisError(message);
       return null;
     } finally {
       setAnalysisLoading(false);
