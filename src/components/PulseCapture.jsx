@@ -251,18 +251,13 @@ function PulseCapture({ onResponseSaved }) {
             {analysisError && <p className="analysis-error">{analysisError}</p>}
           </div>
 
-          <div className="branding">Pulse · anonymous · aggregated data only</div>
         </>
       ) : (
         <>
           <div className="thanks">
             <div className="tick">✓</div>
             <h2>Response received</h2>
-            <p>
-              Your response has been recorded anonymously.
-              <br />
-              Leadership sees aggregated themes only.
-            </p>
+            <p>Your response has been recorded.</p>
 
             {analysisLoading ? (
               <p className="analysis-loading">Analyzing voice response with AI...</p>
@@ -274,9 +269,6 @@ function PulseCapture({ onResponseSaved }) {
               Answer another question
             </button>
           </div>
-
-          <div className="branding">Pulse · anonymous · aggregated data only</div>
-        </>
       )}
     </div>
   );
